@@ -1,0 +1,22 @@
+# Don't track content of these folders
+lib/
+include/
+lib64/
+bin/
+*.egg-info
+.vscode/
+share/
+logs/
+.venv/
+src/*.egg-info/
+src/__pycache__/
+build/
+dist/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Don't track this files
+lib64
+pip-selfcheck.json
+
