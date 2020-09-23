@@ -1,3 +1,9 @@
+## 0.0.7 (2020-09-23)
+
+### Fix
+
+- :ambulance: remove enter and exit methods
+
 ## 0.0.6 (2020-09-18)
 
 ### Refactor
