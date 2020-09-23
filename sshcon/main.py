@@ -13,7 +13,7 @@ from ssh2.sftp import (
 )
 from typing import Union, Optional
 from pathlib import Path
-from sshcon import exceptions
+from sshcon.exceptions import SshConSftpError, SshConError
 import stat
 from ssh2.exceptions import SFTPProtocolError
 import errno
@@ -21,19 +21,13 @@ import os
 
 
 class SshCon:
-    def __init__(self, host, user, key, port=22):
+    def __init__(self, host: str, user: str, key, port: int = 22):
         self.user = user
         self.key = str(key)
         self.host = host
         self.port = port
         self.sftp = None
-
-    def __enter__(self):
         self.session = self._make_session()
-        return self
-
-    def __exit__(self, type, value, traceback):
-        pass
 
     def _make_session(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -141,9 +135,7 @@ class SshCon:
             if force:
                 self.umount(target)
             else:
-                raise SshConError(
-                    "mount", f"Folder {target} is already mountpoint."
-                )
+                raise SshConError("mount", f"Folder {target} is already mountpoint.")
         if mkdir:
             self.mkdir(target, exist_ok=True)
         self.run(["mount", source, target], check=True)
@@ -151,11 +143,10 @@ class SshCon:
     def umount(self, target, rmdir: bool = False):
         self.run(["umount", target], check=True)
 
-    def read_text(self, file, encoding: str = "utf-8") -> str:
+    def read_text(self, file, encoding: str = "utf-8"):
+        text = None
         if self.isfile(file) is False:
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), str(file)
-            )
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), str(file))
         with self._sftp_session().open(
             str(file), LIBSSH2_FXF_READ, LIBSSH2_SFTP_S_IRUSR
         ) as text_file:
@@ -184,16 +175,12 @@ class SshCon:
         if append:
             f_flags = f_flags | LIBSSH2_FXF_APPEND
         elif self.isfile(file):
-            raise FileExistsError(
-                errno.EEXIST, os.strerror(errno.EEXIST), file
-            )
+            raise FileExistsError(errno.EEXIST, os.strerror(errno.EEXIST), file)
 
         with self._sftp_session().open(file, f_flags, mode) as text_file:
             text_file.write(data.encode(encoding))
 
-    def chmod(
-        self, path: Union[Path, str], mode: int, recursive: bool = False
-    ):
+    def chmod(self, path: Union[Path, str], mode: int, recursive: bool = False):
         chmod_cmd = ["chmod", mode, path]
         if recursive:
             chmod_cmd.insert(1, "-R")
