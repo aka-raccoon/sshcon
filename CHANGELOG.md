@@ -1,3 +1,9 @@
+## 0.1.0 (2020-09-26)
+
+### Feat
+
+- add user option to the run func
+
 ## 0.0.7 (2020-09-23)
 
 ### Fix
