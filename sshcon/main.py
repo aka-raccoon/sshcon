@@ -61,11 +61,14 @@ class SshCon:
         cmd: Union[list, str],
         capture_output: bool = False,
         check: bool = True,
+        user: Optional[str] = None,
         encoding: Optional[str] = "utf-8",
     ):
         if isinstance(cmd, list):
             cmd = [str(item) for item in cmd]
             cmd = " ".join(cmd)
+        if user is not None:
+            cmd = f"su - {user} -c '{cmd}'"
         channel = self.session.open_session()
         channel.execute(cmd)
         channel.wait_eof()
