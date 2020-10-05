@@ -80,7 +80,11 @@ class SshCon:
             if rcode:
                 raise OSError(rcode, stderr.decode("utf-8").strip(), cmd)
         if capture_output:
-            _size, stdout = channel.read()
+            size, data = channel.read()
+            stdout = b""
+            while size > 0:
+                stdout += data
+                size, data = channel.read()
             if encoding:
                 stderr = stderr.decode(encoding)
                 stdout = stdout.decode(encoding).rstrip()
