@@ -1,3 +1,9 @@
+## 0.1.1 (2020-10-05)
+
+### Fix
+
+- add while statement to catch long output
+
 ## 0.1.0 (2020-09-26)
 
 ### Feat
