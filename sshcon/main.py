@@ -205,6 +205,34 @@ class SshCon:
             chown_cmd.insert(1, "-R")
         self.run(chown_cmd, check=True)
 
+    def send_file(
+        self,
+        file: Union[Path, str],
+        destination: Union[Path, str],
+        force: bool = False,
+    ):
+        if self.isdir(destination):
+            raise IsADirectoryError(
+                errno.EISDIR, os.strerror(errno.EISDIR), str(file)
+            )
+        if not force:
+            if self.isfile(destination):
+                raise FileExistsError(
+                    errno.EEXIST, os.strerror(errno.EEXIST), str(file)
+                )
+        fileinfo = os.stat(file)
+
+        chan = self.session.scp_send64(
+            str(destination),
+            fileinfo.st_mode & 0o777,
+            fileinfo.st_size,
+            fileinfo.st_mtime,
+            fileinfo.st_atime,
+        )
+
+        with open(file, "rb") as local_fh:
+            for data in local_fh:
+                chan.write(data)        
 
 class CompletedCommand:
     def __init__(self, rcode: int, stdout, stderr):
