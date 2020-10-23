@@ -7,7 +7,7 @@ import os
 import socket
 import stat
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, NamedTuple, Optional, Union
 
 from ssh2.exceptions import SFTPProtocolError
 from ssh2.session import Session
@@ -89,8 +89,7 @@ class SshCon:
             err_code = sftp.last_error()
             if err_code == 2:
                 raise FileNotFoundError(f"File {path} not found.") from msgerr
-            else:
-                raise SshConSftpError("lsstat", err_code) from msgerr
+            raise SshConSftpError("lsstat", err_code) from msgerr
         else:
             return fstat.permissions
 
@@ -101,7 +100,7 @@ class SshCon:
         check: bool = True,
         user: Optional[str] = None,
         encoding: Optional[str] = "utf-8",
-    ) -> Optional["CompletedCommand"]:
+    ) -> Optional[NamedTuple]:
         """Run command on the remote machine.
 
         Raises:
@@ -135,6 +134,7 @@ class SshCon:
                 stderr = stderr.decode(encoding)
                 stdout = stdout.decode(encoding).rstrip()
             return CompletedCommand(rcode, stdout, stderr)
+        return None
 
     def mkdir(
         self,
@@ -407,17 +407,15 @@ class SshCon:
                 chan.write(data)
 
 
-class CompletedCommand:
-    """class to represent ssh connection."""
+class CompletedCommand(NamedTuple):
+    """Class to represent ssh connection.
 
-    def __init__(self, rcode: int, stdout: Union[str, bytes], stderr: str):
-        """Constructs all the necessary attributes for the CompletedCommand object.
+    Args:
+        NamedTuple (rcode, stdout, stderr): Constructs all the necessary
+                                            attributes for the CompletedCommand
+                                            object.
+    """
 
-        Args:
-            rcode (int): Return code.
-            stdout (str): Stdout of a command.
-            stderr (str): Stderr error of a command.
-        """
-        self.rcode = rcode
-        self.stdout = stdout
-        self.stderr = stderr
+    rcode: int
+    stdout: Union[str, bytes]
+    stderr: str
