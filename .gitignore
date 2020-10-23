@@ -19,4 +19,4 @@ __pycache__/
 # Don't track this files
 lib64
 pip-selfcheck.json
-
+.env
