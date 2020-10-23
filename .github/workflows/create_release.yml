@@ -1,0 +1,44 @@
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - '*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Create Release
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: set Environment Variables
+        id: set_env_var
+        run: |
+           VERSION=$(sed 's/[^0-9|.]//g' _Release.h)  # zb. 2.4.2
+           if [ $REPOSITORY = "master" ]; then IS_PRE='false'; else IS_PRE='true'; fi
+           if [ $REPOSITORY = "master" ]; then POSTFIX=''    ; else POSTFIX='PRE';    fi
+           RELEASEBODY=$(awk -v RS='Release ' '/'$VERSION':(.*)/ {print $0}' ChangeLog.h)
+           RELEASEBODY="${RELEASEBODY//'%'/'%25'}"
+           RELEASEBODY="${RELEASEBODY//$'\n'/'%0A'}"
+           RELEASEBODY="${RELEASEBODY//$'\r'/'%0D'}"       
+           echo "::set-output name=version::${VERSION}"
+           echo "::set-output name=IS_PRERELEASE::${IS_PRE}"
+           echo "::set-output name=RELEASENAME_POSTFIX::${POSTFIX}"
+           echo "::set-output name=RELEASEBODY::${RELEASEBODY}"
+           echo "::set-env name=body::${RELEASEBODY}"
+        env:
+          REPOSITORY: ${{ github.event.repository.name }}        
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ${{ steps.set_env_var.outputs.RELEASEBODY }}
+          draft: false
+          prerelease: ${{ steps.set_env_var.outputs.IS_PRERELEASE }}
