@@ -2,7 +2,7 @@
 
 > Python SSH connector for linux systems
 
-Very simple python SSH connector for linux systems based on super fast SSH2 protocol library -> [ssh2-python][https://github.com/ParallelSSH/ssh2-python].
+Python SSH connector for linux systems based on super fast SSH2 protocol library -> [ssh2-python](https://github.com/ParallelSSH/ssh2-python).
 
 ## Installation
 
@@ -18,7 +18,7 @@ from sshcon.main import SshCon
 
 hostname = "myserver"
 ssh_user = "myuser"
-ssh_ke = ".ssh/mykey"
+ssh_key = "/home/user/.ssh/mykey"
 ssh = SshConn(hostname, ssh_user, ssh_key)
 
 # Run command and save output to the variable
@@ -34,14 +34,9 @@ ssh.remove("/my/folder/*.tar", force=True)
 text = ssh.read_text("/folder/text.txt")
 
 # Write text
-ssh.write_text("Ahoj", "/folder/text.txt")
+ssh.write_text("Hey!", "/folder/text.txt")
 
 # Check if file
 if ssh.isfile("/my/file):
     print("It's a file!")
 ```
-
-## Todo
-
-- [ ] Add readthedocs
-- [ ] Update readme
