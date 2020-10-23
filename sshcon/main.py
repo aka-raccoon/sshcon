@@ -270,6 +270,8 @@ class SshCon:
             rmdir (bool, optional): Remove directory after unmount. Defaults to False.
         """
         self.run(["umount", target], check=True)
+        if rmdir:
+            self.rmdir(target)
 
     def read_text(
         self, file: Union[Path, str], encoding: str = "utf-8"
