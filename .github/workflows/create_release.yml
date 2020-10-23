@@ -13,23 +13,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: set Environment Variables
-        id: set_env_var
+      - name: Get changelog body
+        id: get_changelog_body
         run: |
-           VERSION=$(sed 's/[^0-9|.]//g' _Release.h)  # zb. 2.4.2
-           if [ $REPOSITORY = "master" ]; then IS_PRE='false'; else IS_PRE='true'; fi
-           if [ $REPOSITORY = "master" ]; then POSTFIX=''    ; else POSTFIX='PRE';    fi
-           RELEASEBODY=$(awk -v RS='Release ' '/'$VERSION':(.*)/ {print $0}' ChangeLog.h)
-           RELEASEBODY="${RELEASEBODY//'%'/'%25'}"
-           RELEASEBODY="${RELEASEBODY//$'\n'/'%0A'}"
-           RELEASEBODY="${RELEASEBODY//$'\r'/'%0D'}"       
-           echo "::set-output name=version::${VERSION}"
-           echo "::set-output name=IS_PRERELEASE::${IS_PRE}"
-           echo "::set-output name=RELEASENAME_POSTFIX::${POSTFIX}"
-           echo "::set-output name=RELEASEBODY::${RELEASEBODY}"
-           echo "::set-env name=body::${RELEASEBODY}"
-        env:
-          REPOSITORY: ${{ github.event.repository.name }}        
+           VERSION=${{ github.ref }}
+           RELEASEBODY=`sed -n -e '/^## 0.2.0/,/^## /p; d' CHANGELOG.md | head -n -1` 
+           echo "::set-env name=body::${RELEASEBODY}"     
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -41,4 +30,4 @@ jobs:
           body: |
             ${{ steps.set_env_var.outputs.RELEASEBODY }}
           draft: false
-          prerelease: ${{ steps.set_env_var.outputs.IS_PRERELEASE }}
+          prerelease: false
