@@ -10,14 +10,11 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        token: "${{ secrets.GITHUB_TOKEN }}"    
+    - uses: actions/checkout@v2  
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
@@ -30,7 +27,6 @@ jobs:
     - name: Lint with pylint
       run: |
         pylint sshcon
-
     - name: Ensure ssh is installed
       run: sudo apt update; sudo apt -y install openssh-server
     - name: Check config
@@ -70,11 +66,21 @@ jobs:
         pytest
       env:
         SSHHOST: localhost
-        SSHUSER: root
-        SSHKEY: /root/.ssh/id_rsa
+        SSHUSER: runner
+        SSHKEY: ~/.ssh/id_rsa
 
-    - name: Create bump and changelog
-      if: "!startsWith(github.event.head_commit.message, 'bump:')"
-      uses: commitizen-tools/commitizen-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}        
+  bump_version:
+    if: "!startsWith(github.event.head_commit.message, 'bump:')"
+    needs: build
+    runs-on: ubuntu-latest
+    name: "Bump version and create changelog with commitizen"
+    steps:
+      - name: Check out
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Create bump and changelog
+        uses: commitizen-tools/commitizen-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
