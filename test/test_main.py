@@ -49,3 +49,8 @@ def test_run_exception():
 def test_lstat():
     with pytest.raises(FileNotFoundError):
         remote._lstat(MADEUP_DIR)
+
+
+def test_umount_exception():
+    with pytest.raises(PermissionError):
+        remote.umount(MADEUP_DIR)
