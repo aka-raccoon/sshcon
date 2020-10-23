@@ -1,3 +1,10 @@
+## 0.2.0 (2020-10-23)
+
+### Refactor
+
+- :memo: add docstrings
+- rewrite exceptions
+
 ## 0.1.1 (2020-10-05)
 
 ### Fix
