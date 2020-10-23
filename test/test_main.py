@@ -33,6 +33,14 @@ def test_rmdir():
         assert remote.isdir(TEMP_DIR)
 
 
+def test_run():
+    string = "test one two three"
+    echo = remote.run(["echo", string], capture_output=True, check=True)
+    assert echo.stdout == string
+    assert echo.rcode == 0
+    assert echo.stderr == ""
+
+
 def test_run_exception():
     with pytest.raises(OSError):
         remote.run([MADEUP_DIR])
