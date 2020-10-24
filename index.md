@@ -1,37 +1,42 @@
-## Welcome to GitHub Pages
+# sshcon ⚡
 
-You can use the [editor on GitHub](https://github.com/racoonx2p/sshcon/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+> Python SSH connector for linux systems
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Python SSH connector for linux systems based on super fast SSH2 protocol library -> [ssh2-python](https://github.com/ParallelSSH/ssh2-python).
 
-### Markdown
+## Installation
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+```shell
+pip install sshcon
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+## How to use
 
-### Jekyll Themes
+```python
+from sshcon.main import SshCon
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/racoonx2p/sshcon/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
-### Support or Contact
+hostname = "myserver"
+ssh_user = "myuser"
+ssh_key = "/home/user/.ssh/mykey"
+ssh = SshConn(hostname, ssh_user, ssh_key)
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+# Run command and save output to the variable
+ls = ssh.run(["ls", "-latr", path("/mnt"], capture_output=True, check=True).stdout
+
+# Mount directory
+ssh.mount(source="storage:/data", "/mnt", force=True, mkdir=True)
+
+# Remove files
+ssh.remove("/my/folder/*.tar", force=True)
+
+# Read text
+text = ssh.read_text("/folder/text.txt")
+
+# Write text
+ssh.write_text("Hey!", "/folder/text.txt")
+
+# Check if file
+if ssh.isfile("/my/file):
+    print("It's a file!")
+```
