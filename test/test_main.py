@@ -62,16 +62,17 @@ def test_umount_exception():
 
 
 def test_send_file():
-    filename = Path("/tmp/scp_sshcon.tst")
-    with open(filename, "w") as file:
+    local_filename = Path("/tmp/scp_sshcon.tst_local")
+    remote_filename = Path("/tmp/scp_sshcon.tst_remote")
+    with open(local_filename, "w") as file:
         file.write("This is test file for sshcon!")
     try:
-        remote.send_file(filename, filename)
+        remote.send_file(local_filename, remote_filename)
     except FileExistsError:
-        remote.remove(filename)
-        remote.send_file(filename, filename)
-    remote.remove(filename)
-    filename.unlink()
+        remote.remove(remote_filename)
+        remote.send_file(local_filename, remote_filename)
+    remote.remove(remote_filename)
+    local_filename.unlink()
 
 
 def test_write_file():
