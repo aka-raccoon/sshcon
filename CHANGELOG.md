@@ -1,3 +1,13 @@
+## 0.3.0 (2020-10-24)
+
+### Feat
+
+- :rocket: Add get_file function
+
+### Refactor
+
+- make changes to write_file and send_file
+
 ## 0.2.3 (2020-10-23)
 
 ### Refactor

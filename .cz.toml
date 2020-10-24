@@ -1,6 +1,6 @@
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.2.3"
+version = "0.3.0"
 version_files = [
     "setup.cfg:version",
     "docs/conf.py: release"
