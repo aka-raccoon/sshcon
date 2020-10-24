@@ -1,0 +1,29 @@
+sshcon package
+==============
+
+Submodules
+----------
+
+sshcon.exceptions module
+------------------------
+
+.. automodule:: sshcon.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sshcon.main module
+------------------
+
+.. automodule:: sshcon.main
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: sshcon
+   :members:
+   :undoc-members:
+   :show-inheritance:

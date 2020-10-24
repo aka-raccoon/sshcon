@@ -2,7 +2,8 @@
 name = "cz_conventional_commits"
 version = "0.2.3"
 version_files = [
-    "setup.cfg:version"
+    "setup.cfg:version",
+    "docs/conf.py: release"
 ]
 tag_format = "$version"
 bump_message = "release $current_version → $new_version [skip-ci]"
