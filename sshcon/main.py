@@ -424,6 +424,48 @@ class SshCon:
             for data in local_fh:
                 chan.write(data)
 
+    def get_file(
+        self, file: Union[Path, str], destination: Union[Path, str], force: bool = False
+    ) -> None:
+        """Get remote file from a remote location.
+
+        Args:
+            file (Union[Path, str]): File to get from a remote.
+            destination (Union[Path, str]): Local destination.
+            force (bool): Rewrite the file, if exists. Defaults to False
+
+        Raises:
+            IsADirectoryError: Raises if file is a directory.
+            FileNotFoundError:: Raises if remote file not found.
+        """
+        if self.isdir(file):
+            raise IsADirectoryError(errno.EISDIR, os.strerror(errno.EISDIR), str(file))
+
+        chan = self.session.scp_recv2(
+            str(file),
+        )
+
+        mode = "wb+" if force else "xb+"
+        with open(destination, mode) as local_fh:
+            size = 0
+            while True:
+                siz, buf = chan[0].read()
+
+                if siz < 0:
+                    print("error code:", siz)
+                    chan[0].close()
+                    break
+                size += siz
+
+                if size > chan[1].st_size:
+                    local_fh.write(buf[: (chan[1].st_size - size)])
+                else:
+                    local_fh.write(buf)
+
+                if size >= chan[1].st_size:
+                    chan[0].close()
+                    break
+
 
 class CompletedCommand(NamedTuple):
     """Class to represent ssh connection.
