@@ -304,6 +304,7 @@ class SshCon:
         file: Union[Path, str],
         append: bool = False,
         encoding: str = "utf-8",
+        force: bool = False,
     ) -> None:
         """Write text to a remote file.
 
@@ -319,8 +320,11 @@ class SshCon:
             FileExistsError: If target file exists already.
         """
         file = str(file)
-        if self.isdir(file):
-            raise IsADirectoryError(errno.EISDIR, os.strerror(errno.EISDIR), file)
+        try:
+            if self.isdir(file):
+                raise IsADirectoryError(errno.EISDIR, os.strerror(errno.EISDIR), file)
+        except FileNotFoundError:
+            pass
 
         mode = (
             LIBSSH2_SFTP_S_IRUSR
@@ -329,10 +333,13 @@ class SshCon:
             | LIBSSH2_SFTP_S_IROTH
         )
         f_flags = LIBSSH2_FXF_CREAT | LIBSSH2_FXF_WRITE
-        if append:
-            f_flags = f_flags | LIBSSH2_FXF_APPEND
-        elif self.isfile(file):
-            raise FileExistsError(errno.EEXIST, os.strerror(errno.EEXIST), file)
+        try:
+            if append:
+                f_flags = f_flags | LIBSSH2_FXF_APPEND
+            elif self.isfile(file) and not force:
+                raise FileExistsError(errno.EEXIST, os.strerror(errno.EEXIST), file)
+        except FileNotFoundError:
+            pass
 
         with self._sftp_session().open(file, f_flags, mode) as text_file:
             text_file.write(data.encode(encoding))
@@ -380,20 +387,29 @@ class SshCon:
 
         Args:
             file (Union[Path, str]): File to send.
-            destination (Union[Path, str]): Target directory in remote machine.
+            destination (Union[Path, str]): Target filename in remote machine.
             force (bool, optional): Replace file if already exists. Defaults to False.
 
         Raises:
-            IsADirectoryError: [description]
-            FileExistsError: [description]
+            IsADirectoryError: Raises if target destination is a directory.
+            FileExistsError: Raises if target destination exists.
         """
-        if self.isdir(destination):
-            raise IsADirectoryError(errno.EISDIR, os.strerror(errno.EISDIR), str(file))
-        if not force:
-            if self.isfile(destination):
-                raise FileExistsError(
-                    errno.EEXIST, os.strerror(errno.EEXIST), str(file)
+        try:
+            if self.isdir(destination):
+                raise IsADirectoryError(
+                    errno.EISDIR, os.strerror(errno.EISDIR), str(file)
                 )
+        except FileNotFoundError:
+            pass
+
+        if not force:
+            try:
+                if self.isfile(destination):
+                    raise FileExistsError(
+                        errno.EEXIST, os.strerror(errno.EEXIST), str(file)
+                    )
+            except FileNotFoundError:
+                pass
         fileinfo = os.stat(file)
 
         chan = self.session.scp_send64(
@@ -407,6 +423,48 @@ class SshCon:
         with open(file, "rb") as local_fh:
             for data in local_fh:
                 chan.write(data)
+
+    def get_file(
+        self, file: Union[Path, str], destination: Union[Path, str], force: bool = False
+    ) -> None:
+        """Get remote file from a remote location.
+
+        Args:
+            file (Union[Path, str]): File to get from a remote.
+            destination (Union[Path, str]): Local destination.
+            force (bool): Rewrite the file, if exists. Defaults to False
+
+        Raises:
+            IsADirectoryError: Raises if file is a directory.
+            FileNotFoundError:: Raises if remote file not found.
+        """
+        if self.isdir(file):
+            raise IsADirectoryError(errno.EISDIR, os.strerror(errno.EISDIR), str(file))
+
+        chan = self.session.scp_recv2(
+            str(file),
+        )
+
+        mode = "wb+" if force else "xb+"
+        with open(destination, mode) as local_fh:
+            size = 0
+            while True:
+                siz, buf = chan[0].read()
+
+                if siz < 0:
+                    print("error code:", siz)
+                    chan[0].close()
+                    break
+                size += siz
+
+                if size > chan[1].st_size:
+                    local_fh.write(buf[: (chan[1].st_size - size)])
+                else:
+                    local_fh.write(buf)
+
+                if size >= chan[1].st_size:
+                    chan[0].close()
+                    break
 
 
 class CompletedCommand(NamedTuple):

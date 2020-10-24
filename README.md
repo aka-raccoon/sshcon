@@ -12,6 +12,8 @@ pip install sshcon
 
 ## How to use
 
+Make sure you check **[readthedocs](https://sshcon.readthedocs.io/en/latest/)**!
+
 ```python
 from sshcon.main import SshCon
 
