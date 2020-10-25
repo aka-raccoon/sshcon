@@ -19,11 +19,9 @@ ssh_user = "myuser"
 ssh_key = "/home/user/.ssh/mykey"
 ssh = SshConn(hostname, ssh_user, ssh_key)
 
-# Run command and save output to the variable
-ls = ssh.run(["ls", "-latr", path("/mnt"], capture_output=True, check=True).stdout
-
-# Mount directory
-ssh.mount(source="storage:/data", "/mnt", force=True, mkdir=True)
+# Run command and get output
+echo = ssh.run(["ls", "-latr"], capture_output=True)
+print(echo.stdout)
 
 # Remove files
 ssh.remove("/my/folder/*.tar", force=True)
