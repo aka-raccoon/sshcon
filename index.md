@@ -1,7 +1,3 @@
-# sshcon ⚡
-
-> Python SSH connector for linux systems
-
 Python SSH connector for linux systems based on super fast SSH2 protocol library -> [ssh2-python](https://github.com/ParallelSSH/ssh2-python).
 
 ## Installation
@@ -11,6 +7,8 @@ pip install sshcon
 ```
 
 ## How to use
+
+Make sure you check **[readthedocs](https://sshcon.readthedocs.io/en/latest/)**!
 
 ```python
 from sshcon.main import SshCon
