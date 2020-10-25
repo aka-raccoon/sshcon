@@ -1,3 +1,9 @@
+## 0.3.1 (2020-10-25)
+
+### Refactor
+
+- change github actions workflow
+
 ## 0.3.0 (2020-10-24)
 
 ### Feat
