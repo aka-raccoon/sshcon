@@ -1,3 +1,9 @@
+## 0.3.3 (2020-10-29)
+
+### Fix
+
+- fix typing bug - return CompletedCommand
+
 ## 0.3.2 (2020-10-25)
 
 ## 0.3.1 (2020-10-25)
