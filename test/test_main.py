@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 import pytest
-from sshcon.main import SshCon
+from sshcon.main import CompletedCommand, SshCon
 
 host = os.environ["SSHHOST"]
 user = os.environ["SSHUSER"]
@@ -125,3 +125,11 @@ def test_get_file_force():
 
 def test_remove():
     remote.remove(REMOTE_FILENAME)
+
+
+def test_completed_command():
+    command = CompletedCommand(rcode=1, stdout="Test", stderr="Error")
+    assert command
+    assert command.rcode == 1
+    assert command.stderr == "Error"
+    assert command.stdout == "Test"
