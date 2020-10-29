@@ -25,6 +25,20 @@ from ssh2.sftp import (
 from sshcon.exceptions import SshConError, SshConSftpError
 
 
+class CompletedCommand(NamedTuple):
+    """Class to represent ssh connection.
+
+    Args:
+        NamedTuple (rcode, stdout, stderr): Constructs all the necessary
+                                            attributes for the CompletedCommand
+                                            object.
+    """
+
+    rcode: int
+    stdout: Union[str, bytes]
+    stderr: str
+
+
 class SshCon:
     """A class to represent ssh connection."""
 
@@ -100,7 +114,7 @@ class SshCon:
         check: bool = True,
         user: Optional[str] = None,
         encoding: Optional[str] = "utf-8",
-    ) -> Optional[NamedTuple]:
+    ) -> Optional[CompletedCommand]:
         """Run command on the remote machine.
 
         Raises:
@@ -465,17 +479,3 @@ class SshCon:
                 if size >= chan[1].st_size:
                     chan[0].close()
                     break
-
-
-class CompletedCommand(NamedTuple):
-    """Class to represent ssh connection.
-
-    Args:
-        NamedTuple (rcode, stdout, stderr): Constructs all the necessary
-                                            attributes for the CompletedCommand
-                                            object.
-    """
-
-    rcode: int
-    stdout: Union[str, bytes]
-    stderr: str
