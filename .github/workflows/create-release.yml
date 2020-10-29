@@ -16,7 +16,7 @@ jobs:
       - name: Get changelog body
         id: get_changelog_body
         run: |
-          echo 'RELEASEBODY<<EOF' >> $GITHUB_ENV
+          echo 'release_body<<EOF' >> $GITHUB_ENV
           sed -n -e '/^## 0.2.0/,/^## /p; d' CHANGELOG.md | head -n -1 >> $GITHUB_ENV 
           echo 'EOF' >> $GITHUB_ENV
       - name: Create Release
@@ -28,6 +28,6 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body: |
-            $RELEASEBODY
+            $release_body
           draft: false
           prerelease: false
